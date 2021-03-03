@@ -1,0 +1,1 @@
+print('This is a hw1 of 20170031 Daehee Kim')
