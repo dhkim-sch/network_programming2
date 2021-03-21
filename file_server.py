@@ -1,0 +1,54 @@
+from socket import *
+import os
+
+BUF_SIZE = 1024
+LENGTH = 20
+
+sock = socket(AF_INET, SOCK_STREAM)
+sock.bind(('', 7777))
+sock.listen(10)
+print('File server is running...')
+
+while True:
+    conn, addr = sock.accept()
+
+    msg = conn.recv(BUF_SIZE)
+    if not msg:
+        conn.close()
+        continue
+    elif msg != b'Hello':
+        print('client:', addr, msg.decode())
+        conn.close()
+        continue
+    else:
+        print('cleint:', addr, msg.decode())
+
+    conn.send(b'Filename')
+    msg = conn.recv(BUF_SIZE)
+    if not msg:
+        conn.close()
+        continue
+    filename = msg.decode()
+    print('client:', addr, filename)
+    try:
+        filesize = os.path.getsize(filename)
+    except:
+        conn.send(b'Nofile')
+        conn.close()
+        continue
+    else:
+        filesize_network = htonl(filesize)
+        conn.send(str(filesize_network).zfill(LENGTH).encode())
+
+    f = open(filename, 'rb')
+    data = f.read()
+    conn.sendall(data)
+
+    msg = conn.recv(BUF_SIZE)
+    if not msg:
+        pass
+    else:
+        print('client:', addr, msg.decode())
+
+    f.close()
+    conn.close()
