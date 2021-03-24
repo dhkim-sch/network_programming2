@@ -2,7 +2,7 @@ from socket import *
 import sys
 
 BUF_SIZE = 1024
-LENGTH = 20
+LENGTH = 4
 
 s = socket(AF_INET, SOCK_STREAM)
 s.connect(('localhost', 7777))
@@ -43,7 +43,8 @@ else:
     if rx_size < LENGTH:
         s.close()
         sys.exit()
-    filesize = ntohl(int(data))
+    filesize = int.from_bytes(data, 'big')
+    #filesize = ntohl(int(data))
     print('server:', filesize)
 
 rx_size = 0

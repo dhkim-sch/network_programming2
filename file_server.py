@@ -2,7 +2,7 @@ from socket import *
 import os
 
 BUF_SIZE = 1024
-LENGTH = 20
+LENGTH = 4
 
 sock = socket(AF_INET, SOCK_STREAM)
 sock.bind(('', 7777))
@@ -37,8 +37,9 @@ while True:
         conn.close()
         continue
     else:
-        filesize_network = htonl(filesize)
-        conn.send(str(filesize_network).zfill(LENGTH).encode())
+        fs_binary = filesize.to_bytes(LENGTH, 'big')
+        #filesize_network = htonl(filesize)
+        conn.send(fs_binary)
 
     f = open(filename, 'rb')
     data = f.read()
